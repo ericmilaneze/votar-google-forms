@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -73,7 +72,7 @@ namespace Votar
         {
             try
             {
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(4));
                 wait.Until(d => d.FindElement(By.CssSelector(".freebirdFormviewerViewResponseLinksContainer a")));
             }
             catch (Exception ex)
