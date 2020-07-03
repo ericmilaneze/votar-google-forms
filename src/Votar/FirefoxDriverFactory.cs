@@ -1,5 +1,5 @@
+using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.Remote;
 
 namespace Votar
 {
@@ -12,14 +12,7 @@ namespace Votar
             this.driversDirectory = driversDirectory;
         }
 
-        public RemoteWebDriver GetDriver()
-        {
-            var service = GetFirefoxDriverService();
-            var options = GetFirefoxOptions();
-            return new FirefoxDriver(service, options);
-        }
-
-        private FirefoxDriverService GetFirefoxDriverService()
+        protected override DriverService GetDriverService()
         {
             var service = FirefoxDriverService.CreateDefaultService(driversDirectory);
             service.HideCommandPromptWindow = true;
@@ -27,7 +20,7 @@ namespace Votar
             return service;
         }
 
-        private FirefoxOptions GetFirefoxOptions()
+        protected override DriverOptions GetOptions()
         {
             var options = new FirefoxOptions();
             options.LogLevel = FirefoxDriverLogLevel.Error;

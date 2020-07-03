@@ -1,5 +1,5 @@
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Remote;
 
 namespace Votar
 {
@@ -12,14 +12,7 @@ namespace Votar
             this.driversDirectory = driversDirectory;
         }
 
-        public RemoteWebDriver GetDriver()
-        {
-            var service = GetChromeDriverService();
-            var options = GetChromeOptions();
-            return new ChromeDriver(service, options);
-        }
-
-        private ChromeDriverService GetChromeDriverService()
+        protected override DriverService GetDriverService()
         {
             var service = ChromeDriverService.CreateDefaultService(driversDirectory);
             service.HideCommandPromptWindow = true;
@@ -27,7 +20,7 @@ namespace Votar
             return service;
         }
 
-        private ChromeOptions GetChromeOptions()
+        protected override DriverOptions GetOptions()
         {
             var options = new ChromeOptions();
             options.AddArgument("--silent");

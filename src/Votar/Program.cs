@@ -25,10 +25,22 @@ namespace Votar
 
             while (true)
             {
-                pagaeNavigator.NavigateToFormAndVote(LogError);
-                ShowCount(pagaeNavigator.VoteCount);
-                DelayBeforeNextIteration();
+                try
+                {
+                    Vote(pagaeNavigator);
+                }
+                catch (Exception) 
+                {
+                    DelayBeforeNextIteration();
+                }
             }
+        }
+
+        private static void Vote(PageNavigator pagaeNavigator)
+        {
+            pagaeNavigator.NavigateToFormAndVote(LogError);
+            ShowCount(pagaeNavigator.VoteCount);
+            DelayBeforeNextIteration();
         }
 
         private static void ShowCount(int voteCount)
