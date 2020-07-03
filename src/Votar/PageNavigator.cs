@@ -1,8 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Support.UI;
 
@@ -17,14 +15,13 @@ namespace Votar
 
         public PageNavigator(Settings settings)
         {
-            this.settings = settings;
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             VoteCount = 0;
             errorCount = 0;
         }
 
         public void NavigateToFormAndVote(Action<Exception> LogError = null)
         {
-
             try
             {
                 Vote();
@@ -51,56 +48,16 @@ namespace Votar
 
         private RemoteWebDriver GetDriver()
         {
+            var driverFactory = GetDriverFactory();
+            return driverFactory.GetDriver();
+        }
+
+        private DriverFactory GetDriverFactory()
+        {
             bool isEven = (VoteCount + errorCount) % 2 == 0;
             if (isEven)
-                return GetFirefoxDriver();
-            return GetChromeDriver();
-        }
-
-        private RemoteWebDriver GetFirefoxDriver()
-        {
-            var service = GetFirefoxDriverService();
-            var options = GetFirefoxOptions();
-            return new FirefoxDriver(service, options);
-        }
-
-        private FirefoxDriverService GetFirefoxDriverService()
-        {
-            var service = FirefoxDriverService.CreateDefaultService(settings.DriversDirectory);
-            service.HideCommandPromptWindow = true;
-            service.SuppressInitialDiagnosticInformation = true;
-            return service;
-        }
-
-        private FirefoxOptions GetFirefoxOptions()
-        {
-            var options = new FirefoxOptions();
-            options.LogLevel = FirefoxDriverLogLevel.Error;
-            return options;
-        }
-
-        private RemoteWebDriver GetChromeDriver()
-        {
-            var service = GetChromeDriverService();
-            var options = GetChromeOptions();
-            return new ChromeDriver(service, options);
-        }
-
-        private ChromeDriverService GetChromeDriverService()
-        {
-            var service = ChromeDriverService.CreateDefaultService(settings.DriversDirectory);
-            service.HideCommandPromptWindow = true;
-            service.SuppressInitialDiagnosticInformation = true;
-            return service;
-        }
-
-        private ChromeOptions GetChromeOptions()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--silent");
-            options.AddArgument("--disable-gpu");
-            options.AddArgument("--log-level=3");
-            return options;
+                return new FirefoxDriverFactory(settings.DriversDirectory);
+            return new ChromeDriverFactory(settings.DriversDirectory);
         }
 
         private void NavigateToForm(RemoteWebDriver driver) =>
