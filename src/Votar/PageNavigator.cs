@@ -9,12 +9,17 @@ namespace Votar
     public class PageNavigator
     {
         private readonly Settings settings;
+        private readonly IDriverFactoryChooser driverFactoryChooser;
+        private readonly ILogger logger;
+
         private int errorCount;
 
         public int VoteCount { get; private set; }
 
-        public PageNavigator(Settings settings)
+        public PageNavigator(Settings settings, IDriverFactoryChooser driverFactoryChooser, ILogger logger)
         {
+            this.driverFactoryChooser = driverFactoryChooser ?? throw new ArgumentNullException(nameof(driverFactoryChooser));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             VoteCount = 0;
             errorCount = 0;
@@ -29,7 +34,7 @@ namespace Votar
             }
             catch (Exception ex)
             {
-                this.LogError(LogError, ex);
+                logger.LogError(ex);
                 errorCount++;
             }
         }
@@ -48,16 +53,8 @@ namespace Votar
 
         private RemoteWebDriver GetDriver()
         {
-            var driverFactory = GetDriverFactory();
+            var driverFactory = driverFactoryChooser.GetDriverFactory(VoteCount, errorCount);
             return driverFactory.GetDriver();
-        }
-
-        private DriverFactory GetDriverFactory()
-        {
-            bool isEven = (VoteCount + errorCount) % 2 == 0;
-            if (isEven)
-                return new FirefoxDriverFactory(settings.DriversDirectory);
-            return new ChromeDriverFactory(settings.DriversDirectory);
         }
 
         private void NavigateToForm(RemoteWebDriver driver) =>
@@ -85,11 +82,5 @@ namespace Votar
 
         private void DelayBeforeClosingForm() =>
             Task.Delay(1000).Wait();
-
-        private void LogError(Action<Exception> LogError, Exception ex)
-        {
-            if (LogError != null)
-                LogError.Invoke(ex);
-        }
     }
 }

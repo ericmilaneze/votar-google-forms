@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Votar
@@ -11,17 +10,13 @@ namespace Votar
         private static string LOGS_PATH = "/home/eric/logs/";
         private static string DRIVERS_DIRECTORY = "/home/eric/bin/";
 
-        private static Settings settings = 
-            new Settings
-            {
-                Url = URL,
-                LogsPath = LOGS_PATH,
-                DriversDirectory = DRIVERS_DIRECTORY
-            };
-
         static void Main(string[] args)
         {
-            var pagaeNavigator = new PageNavigator(settings);
+            var settings = GetSettings();
+            var driverFactoryChooser = new DriverFactoryChooser(settings.DriversDirectory);
+            var logger = new Logger(settings.LogsPath);
+
+            var pagaeNavigator = new PageNavigator(settings, driverFactoryChooser, logger);
 
             while (true)
             {
@@ -29,16 +24,24 @@ namespace Votar
                 {
                     Vote(pagaeNavigator);
                 }
-                catch (Exception) 
+                catch
                 {
                     DelayBeforeNextIteration();
                 }
             }
         }
 
+        private static Settings GetSettings() =>
+            new Settings
+            {
+                Url = URL,
+                LogsPath = LOGS_PATH,
+                DriversDirectory = DRIVERS_DIRECTORY
+            };
+
         private static void Vote(PageNavigator pagaeNavigator)
         {
-            pagaeNavigator.NavigateToFormAndVote(LogError);
+            pagaeNavigator.NavigateToFormAndVote();
             ShowCount(pagaeNavigator.VoteCount);
             DelayBeforeNextIteration();
         }
@@ -51,16 +54,5 @@ namespace Votar
 
         private static void DelayBeforeNextIteration() =>
             Task.Delay(4000).Wait();
-
-        private static void LogError(Exception ex)
-        {
-            try
-            {
-                string logFilePath = Path.Combine(settings.LogsPath, $"votar-{DateTime.Now:yyyyMMddHHmmssfff}");
-                using (StreamWriter writer = new StreamWriter(logFilePath, true))
-                    writer.WriteLine(ex.Message);
-            }
-            catch { }
-        }
     }
 }
