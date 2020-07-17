@@ -1,5 +1,6 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Remote;
 
 namespace Votar
 {
@@ -24,7 +25,11 @@ namespace Votar
         {
             var options = new FirefoxOptions();
             options.LogLevel = FirefoxDriverLogLevel.Error;
+            options.AddArgument("--headless");
             return options;
         }
+
+        protected override RemoteWebDriver GetSpecificDriver(DriverService service, DriverOptions options) =>
+            new FirefoxDriver(service as FirefoxDriverService, options as FirefoxOptions);
     }
 }

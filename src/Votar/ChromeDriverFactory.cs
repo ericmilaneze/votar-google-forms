@@ -1,5 +1,6 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Remote;
 
 namespace Votar
 {
@@ -26,7 +27,11 @@ namespace Votar
             options.AddArgument("--silent");
             options.AddArgument("--disable-gpu");
             options.AddArgument("--log-level=3");
+            options.AddArgument("--headless");
             return options;
         }
+
+        protected override RemoteWebDriver GetSpecificDriver(DriverService service, DriverOptions options) =>
+            new ChromeDriver(service as ChromeDriverService, options as ChromeOptions);
     }
 }

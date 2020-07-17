@@ -1,5 +1,4 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
 
 namespace Votar
@@ -10,9 +9,10 @@ namespace Votar
         {
             var service = GetDriverService();
             var options = GetOptions();
-            return new ChromeDriver(service as ChromeDriverService, options as ChromeOptions);
+            return GetSpecificDriver(service, options);
         }
 
+        protected abstract RemoteWebDriver GetSpecificDriver(DriverService service, DriverOptions options);
         protected abstract DriverService GetDriverService();
         protected abstract DriverOptions GetOptions();
     }

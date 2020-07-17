@@ -54,7 +54,8 @@ namespace Votar
         private RemoteWebDriver GetDriver()
         {
             var driverFactory = driverFactoryChooser.GetDriverFactory(VoteCount, errorCount);
-            return driverFactory.GetDriver();
+            var driver = driverFactory.GetDriver();
+            return driver;
         }
 
         private void NavigateToForm(RemoteWebDriver driver) =>
